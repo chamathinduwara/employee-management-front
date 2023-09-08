@@ -1,13 +1,16 @@
 import { ChangeEvent, FormEvent, useState } from 'react'
 import './AddEmployee.css'
 import EmployeeService from '../../services/EmployeeService';
+import { useNavigate } from 'react-router-dom';
 
 const AddEmployee = () => {
     const [ employee, setEmployee] = useState({
+        id: "",
         firstName: "",
         lastName: "",
         emailId: "",
-    })
+    });
+      const navigate = useNavigate();
     function handleChange(e: ChangeEvent<HTMLInputElement>){
         const {name, value} = e.target;
         
@@ -23,6 +26,7 @@ const AddEmployee = () => {
         EmployeeService.saveEmployee(employee)
         .then((respone) => {
             console.log(respone)
+            navigate("/");
         })
         .catch((error) => {
             console.log(error)
@@ -30,6 +34,12 @@ const AddEmployee = () => {
     }
     const clearEmployee = (e: FormEvent) => {
         e.preventDefault();
+        setEmployee({
+            id: "",
+            firstName: "",
+            lastName: "",
+            emailId: "",
+        });
     }
 
   return (

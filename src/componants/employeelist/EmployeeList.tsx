@@ -1,11 +1,52 @@
-import { useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import EmployeeService from "../../services/EmployeeService";
 
 const EmployeeList = () => {
   const navigate = useNavigate();
-  const [employees, setEmployees] = useState(null);
-  const [loading, setLoading] = useState(null);
 
+  const [employees, setEmployees] = useState<EmpolyeeRepository[] | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await EmployeeService.getEmployees();
+        setEmployees(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  function deleteEmployee(e: FormEvent, id: string) {
+    e.preventDefault();
+    EmployeeService.deleteEmployee(id)
+      .then((respone) => {
+        console.log(respone);
+        const fetchData = async () => {
+          setLoading(true);
+          try {
+            const response = await EmployeeService.getEmployees();
+            setEmployees(response.data);
+          } catch (error) {
+            console.log(error);
+          }
+          setLoading(false);
+        };
+        fetchData();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  function updateEmployee(e: FormEvent, employee: EmpolyeeRepository) {
+    e.preventDefault();
+  }
   return (
     <div className="container mx-auto my-6">
       <div className="h-12 ">
@@ -34,31 +75,44 @@ const EmployeeList = () => {
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white">
-            <tr>
-              <td className="text-left py-3 px-3 whitespace-nowrap">
-                <div className="text-sm text-gray-500">Chamath</div>
-              </td>
-              <td className="text-left py-3 px-3 whitespace-nowrap">
-                <div className="text-sm text-gray-500">Induwara</div>
-              </td>
-              <td className="text-left py-3 px-3 whitespace-nowrap">
-                <div className="text-sm text-gray-500">chamath@gmail.com</div>
-              </td>
+          {!loading && (
+            <tbody className="bg-white">
+              {employees?.map((employees) => (
+                <tr key={employees.id}>
+                  <td className="text-left py-3 px-3 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">
+                      {employees.firstName}
+                    </div>
+                  </td>
+                  <td className="text-left py-3 px-3 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">
+                      {employees.lastName}
+                    </div>
+                  </td>
+                  <td className="text-left py-3 px-3 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">
+                      {employees.emailId}
+                    </div>
+                  </td>
 
-              <td className="text-right py-3 px-3 whitespace-nowrap font-medium text-sm">
-                <a
-                  href="#"
-                  className="text-indigo-600 hover:text-indigo-800  px-4"
-                >
-                  Edit
-                </a>
-                <a href="#" className="text-indigo-600 hover:text-indigo-800 ">
-                  Delete
-                </a>
-              </td>
-            </tr>
-          </tbody>
+                  <td className="text-right py-3 px-3 whitespace-nowrap font-medium text-sm">
+                    <button
+                      onClick={(e) => updateEmployee(e, employees)}
+                      className="text-indigo-600 hover:text-indigo-800  px-4"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={(e) => deleteEmployee(e, employees.id)}
+                      className="text-indigo-600 hover:text-indigo-800 "
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          )}
         </table>
       </div>
     </div>
