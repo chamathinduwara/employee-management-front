@@ -44,8 +44,9 @@ const EmployeeList = () => {
       });
   }
 
-  function updateEmployee(e: FormEvent, employee: EmpolyeeRepository) {
+  function updateEmployee(e: FormEvent, id: string) {
     e.preventDefault();
+    navigate(`/updateEmployee/${id}`);
   }
   return (
     <div className="container mx-auto my-6">
@@ -97,7 +98,7 @@ const EmployeeList = () => {
 
                   <td className="text-right py-3 px-3 whitespace-nowrap font-medium text-sm">
                     <button
-                      onClick={(e) => updateEmployee(e, employees)}
+                      onClick={(e) => updateEmployee(e, employees.id)}
                       className="text-indigo-600 hover:text-indigo-800  px-4"
                     >
                       Edit
